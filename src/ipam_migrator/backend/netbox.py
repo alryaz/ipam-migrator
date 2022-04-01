@@ -18,12 +18,12 @@
 #
 
 
-'''
+"""
 phpIPAM database backend.
-'''
-
+"""
 
 import requests
+import requests.auth
 
 from ipam_migrator.backend.base import BaseBackend
 
@@ -40,64 +40,62 @@ from ipam_migrator.exception import AuthMethodUnsupportedError
 
 
 class HTTPTokenAuth(requests.auth.AuthBase):
-    '''
+    """
     Attaches HTTP Token Authentication to the given Request object.
-    '''
-
+    """
 
     # pylint: disable=too-few-public-methods
 
-
     def __init__(self, token):
-        '''
+        """
         HTTPTokenAuth object constructor.
-        '''
+        """
 
         self.token = token
 
-
     def __eq__(self, other):
-        '''
+        """
         HTTPTokenAuth equality checking method.
-        '''
+        """
 
         return self.token == other.token
 
-
     def __ne__(self, other):
-        '''
+        """
         HTTPTokenAuth non-equality checking method.
-        '''
+        """
 
         return self.token != other.token
 
-
     def __call__(self, req):
-        '''
+        """
         HTTPTokenAuth calling method.
-        '''
+        """
 
         req.headers["Authorization"] = "Token {}".format(self.token)
         return req
 
 
 class NetBox(BaseBackend):
-    '''
+    """
     NetBox API backend.
-    '''
-
+    """
 
     # pylint: disable=too-many-public-methods
 
-
     # pylint: disable=too-many-arguments
-    def __init__(self,
-                 logger, name,
-                 api_endpoint, api_auth_method,
-                 api_auth_data, api_ssl_verify):
-        '''
+    def __init__(
+        self,
+        logger,
+        name,
+        api_endpoint,
+        api_auth_method,
+        api_auth_data,
+        api_ssl_verify,
+    ):
+        """
         NetBox API backend constructor.
-        '''
+        """
 
         super().__init__(logger, name)
 
@@ -127,26 +125,28 @@ class NetBox(BaseBackend):
             try:
                 from urllib3 import disable_warnings
                 from urllib3.exceptions import InsecureRequestWarning
+
                 disable_warnings(InsecureRequestWarning)
             except ImportError:
                 pass
             try:
                 from requests.packages.urllib3 import disable_warnings
-                from requests.packages.urllib3.exceptions import InsecureRequestWarning
+                from requests.packages.urllib3.exceptions import (
+                    InsecureRequestWarning,
+                )
+
                 disable_warnings(InsecureRequestWarning)
             except ImportError:
                 pass
-
 
     #
     ##
     #
 
-
     def api_authenticate(self):
-        '''
+        """
         Authenticate with the API backend.
-        '''
+        """
 
         if self.token:
             return
@@ -161,11 +161,10 @@ class NetBox(BaseBackend):
                 ),
             )
 
-
     def api_get(self, uri):
-        '''
+        """
         Send a GET request to the API backend.
-        '''
+        """
 
         self.api_authenticate()
 
@@ -176,9 +175,9 @@ class NetBox(BaseBackend):
 
         obj = response.json()
 
-        if response.status_code == 200: # OK
+        if response.status_code == 200:  # OK
             return obj["results"]
-        elif response.status_code == 400: # Bad request
+        elif response.status_code == 400:  # Bad request
             raise APIGetError(
                 response.status_code,
                 "bad request:\n{}".format(
@@ -188,21 +187,19 @@ class NetBox(BaseBackend):
         else:
             raise APIGetError(response.status_code, "(unhandled error code)")
 
-
     def api_read(self, *args):
-        '''
+        """
         Read an object from the API backend.
-        '''
+        """
 
         command = "/".join((str(a) for a in args))
 
         return self.api_get("{}/{}/".format(self.api_endpoint, command))
 
-
     def api_search(self, *args, **kwargs):
-        '''
+        """
         Search for objects on the API backend.
-        '''
+        """
 
         link = "/".join(args)
         params = "&".join(["{}={}".format(k, v) for k, v in kwargs.items()])
@@ -210,11 +207,10 @@ class NetBox(BaseBackend):
 
         return self.api_get("{}/{}".format(self.api_endpoint, command))
 
-
     def api_write(self, *args, data=None):
-        '''
+        """
         Write an object to the API backend.
-        '''
+        """
 
         self.api_authenticate()
 
@@ -238,7 +234,7 @@ class NetBox(BaseBackend):
 
         obj = response.json()
 
-        if response.status_code == 200: # OK
+        if response.status_code == 200:  # OK
             if req_type == "POST":
                 raise APIWriteError(
                     0,
@@ -247,16 +243,16 @@ class NetBox(BaseBackend):
                     "(e.g. when being redirected from HTTP to HTTPS), URI: {}".format(uri),
                 )
             return obj
-        if response.status_code == 201: # Created
+        if response.status_code == 201:  # Created
             return obj
-        elif response.status_code == 400: # Bad Request
+        elif response.status_code == 400:  # Bad Request
             raise APIWriteError(
                 response.status_code,
                 "bad request:\n{}".format(
                     "\n".join(("  {}: {}".format(k, v) for k, v in obj.items())),
                 ),
             )
-        elif response.status_code == 405: # Method Not Allowed
+        elif response.status_code == 405:  # Method Not Allowed
             raise APIWriteError(
                 response.status_code,
                 "method not allowed at URI '{}', is the right URI being accessed?".format(
@@ -266,36 +262,34 @@ class NetBox(BaseBackend):
         else:
             raise APIWriteError(response.status_code, "(unhandled error code)")
 
-
     def api_put(self, *args, data=None):
-        '''
+        """
         Send a PUT request to the API backend.
-        '''
+        """
 
         return self.api_write("PUT", *args, data=data)
 
-
     def api_post(self, *args, data=None):
-        '''
+        """
         Send a POST request to the API backend.
-        '''
+        """
 
         return self.api_write("POST", *args, data=data)
-
 
     #
     ##
     #
 
-
-    def database_read(self,
-                      read_ip_addresses=True,
-                      read_prefixes=True,
-                      read_vlans=True,
-                      read_vrfs=False):
-        '''
+    def database_read(
+        self,
+        read_ip_addresses=True,
+        read_prefixes=True,
+        read_vlans=True,
+        read_vrfs=False,
+    ):
+        """
         Read a Database object from the API backend.
-        '''
+        """
 
         vlans = self.vlans_read() if read_vlans else None
         vrfs = self.vrfs_read() if read_vrfs else None
@@ -310,60 +304,54 @@ class NetBox(BaseBackend):
             vrfs=vrfs,
         )
 
-
     def vlans_read(self):
-        '''
+        """
         Read a dictionary of VLAN objects from the API backend.
-        '''
+        """
 
         req = self.api_read("ipam", "vlans")
         res = req.json()
 
-        return {data["id"]:self.vlan_get(data) for data in res["results"]}
-
+        return {data["id"]: self.vlan_get(data) for data in res["results"]}
 
     def vrfs_read(self):
-        '''
+        """
         Read a dictionary of VRF objects from the API backend.
-        '''
+        """
 
         req = self.api_read("ipam", "vrfs")
         res = req.json()
 
-        return {data["id"]:self.vrf_get(data) for data in res["results"]}
-
+        return {data["id"]: self.vrf_get(data) for data in res["results"]}
 
     def prefixes_read(self):
-        '''
+        """
         Read a dictionary of Prefix objects from the API backend.
-        '''
+        """
 
         req = self.api_read("ipam", "prefixes")
         res = req.json()
 
-        return {data["id"]:self.prefix_get(data) for data in res["results"]}
-
+        return {data["id"]: self.prefix_get(data) for data in res["results"]}
 
     def ip_addresses_read(self):
-        '''
+        """
         Read a dictionary of IPAddress objects from the API backend.
-        '''
+        """
 
         req = self.api_read("ipam", "ip-addresses")
         res = req.json()
 
-        return {data["id"]:self.ip_address_get(data) for data in res["results"]}
-
+        return {data["id"]: self.ip_address_get(data) for data in res["results"]}
 
     #
     ##
     #
 
-
     def database_write(self, database):
-        '''
+        """
         Write a Database object to the API backend.
-        '''
+        """
 
         # pylint: disable=unused-variable
 
@@ -387,8 +375,10 @@ class NetBox(BaseBackend):
             prefixes_old = database.prefixes
             prefixes_new, prefixes_old_to_new = self.prefixes_write(
                 prefixes_old,
-                vlans_new, vlans_old_to_new,
-                vrfs_new, vrfs_old_to_new,
+                vlans_new,
+                vlans_old_to_new,
+                vrfs_new,
+                vrfs_old_to_new,
             )
         else:
             prefixes_old = {}
@@ -399,22 +389,18 @@ class NetBox(BaseBackend):
             ip_addresses_old = database.ip_addresses
             ip_addresses_new, ip_addresses_old_to_new = self.ip_addresses_write(
                 ip_addresses_old,
-                vrfs_new, vrfs_old_to_new,
+                vrfs_new,
+                vrfs_old_to_new,
             )
         else:
             ip_addresses_old = {}
             ip_addresses_new = {}
             ip_addresses_old_to_new = {}
 
-
-    def obj_write(self,
-                  obj_type,
-                  obj_search_params,
-                  obj_data,
-                  obj_get_func):
-        '''
+    def obj_write(self, obj_type, obj_search_params, obj_data, obj_get_func):
+        """
         Write an Object to the API backend.
-        '''
+        """
 
         # Check if an equivalent object already exists on NetBox.
         # If there is one, we will overwrite its data and reuse its ID
@@ -424,7 +410,9 @@ class NetBox(BaseBackend):
 
         if current_obj:
             new_obj_data = self.api_put(
-                "ipam", obj_type, current_obj["id"],
+                "ipam",
+                obj_type,
+                current_obj["id"],
                 data=obj_data,
             )
         else:
@@ -438,19 +426,17 @@ class NetBox(BaseBackend):
 
         return new_obj
 
-
     def vrfs_write(self, vrfs):
-        '''
+        """
         Write a dictionary of VRF objects to the API backend.
-        '''
+        """
 
         raise NotImplementedError()
 
-
     def vlans_write(self, vlans):
-        '''
+        """
         Write a dictionary of VLAN objects to the API backend.
-        '''
+        """
 
         self.logger.info("Writing VLANs...")
 
@@ -480,17 +466,13 @@ class NetBox(BaseBackend):
 
         return (vlans_new, vlans_old_to_new)
 
-
     # pylint: disable=unused-argument
-    def prefixes_write(self,
-                       prefixes,
-                       vlans_new, vlans_old_to_new,
-                       vrfs_new, vrfs_old_to_new):
-        '''
+    def prefixes_write(self, prefixes, vlans_new, vlans_old_to_new, vrfs_new, vrfs_old_to_new):
+        """
         Write a dictionary of Prefix objects to the API backend,
         using previously written VRFs and VLANs to preserve reference
         information.
-        '''
+        """
 
         self.logger.info("Writing prefixes...")
 
@@ -522,15 +504,12 @@ class NetBox(BaseBackend):
 
         return (prefixes_new, prefixes_old_to_new)
 
-
-    def ip_addresses_write(self,
-                           ip_addresses,
-                           vrfs_new, vrfs_old_to_new):
-        '''
+    def ip_addresses_write(self, ip_addresses, vrfs_new, vrfs_old_to_new):
+        """
         Write a dictionary of IPAddress objects to the API backend,
         using previously written VRFs to preserve reference
         information.
-        '''
+        """
 
         self.logger.info("Writing IP addresses...")
 
@@ -561,77 +540,71 @@ class NetBox(BaseBackend):
 
         return (ip_addresses_new, ip_addresses_old_to_new)
 
-
     #
     ##
     #
 
-
     @staticmethod
     def object_id_get(data, key):
-        '''
+        """
         Get an object ID from the given key in the data dictionary.
-        '''
+        """
 
         if isinstance(data[key], int):
             return data[key]
         return data[key]["id"] if key in data and data[key] is not None else None
 
-
     @staticmethod
     def ip_address_get(data):
-        '''
+        """
         Get an IPAddress object from the given data dictionary.
-        '''
+        """
 
         return IPAddress(
-            data["id"], # ip_address_id
-            data["address"].split("/")[0], # address
+            data["id"],  # ip_address_id
+            data["address"].split("/")[0],  # address
             description=data["description"],
             custom_fields=data["custom_fields"] if "custom_fields" in data else None,
             vrf_id=NetBox.object_id_get(data, "vrf"),
         )
 
-
     @staticmethod
     def prefix_get(data):
-        '''
+        """
         Get a Prefix object from the given data dictionary.
-        '''
+        """
 
         return Prefix(
-            data["id"], # prefix_id
-            data["prefix"], # prefix
+            data["id"],  # prefix_id
+            data["prefix"],  # prefix
             is_pool=data["is_pool"],
             description=data["description"],
             vlan_id=NetBox.object_id_get(data, "vlan"),
             vrf_id=NetBox.object_id_get(data, "vrf"),
         )
 
-
     @staticmethod
     def vlan_get(data):
-        '''
+        """
         Get a VLAN object from the given data dictionary.
-        '''
+        """
 
         return VLAN(
-            data["id"], # vlan_id
-            data["vid"], # vid
+            data["id"],  # vlan_id
+            data["vid"],  # vid
             name=data["name"],
             description=data["description"],
         )
 
-
     @staticmethod
     def vrf_get(data):
-        '''
+        """
         Get a VRF object from the given data dictionary.
-        '''
+        """
 
         return VRF(
-            data["id"], # vrf_id
-            data["rd"], # route_distinguisher
+            data["id"],  # vrf_id
+            data["rd"],  # route_distinguisher
             enforce_unique=data["enforce_unique"],
             name=data["name"],
             description=data["description"],

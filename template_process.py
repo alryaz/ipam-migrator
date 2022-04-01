@@ -25,10 +25,10 @@ import re
 
 
 def template_process(config, input_file, output_file):
-    '''
+    """
     Process the given input file with respect to the given config,
     and write the result to the output file.
-    '''
+    """
 
     with open(input_file, "r", encoding="UTF-8") as i:
         with open(output_file, "w", encoding="UTF-8") as o:
@@ -40,46 +40,50 @@ def template_process(config, input_file, output_file):
             o.write(text)
 
 
-# Get arguments.
-argparser = argparse.ArgumentParser()
+def main():
 
-argparser.add_argument(
-    "input-file",
-    metavar = "INFILE",
-    type = str,
-    help ="template file to process",
-)
+    # Get arguments.
+    argparser = argparse.ArgumentParser()
 
-argparser.add_argument(
-    "output-file",
-    metavar = "OUTFILE",
-    type = str,
-    help ="location to save processed file to",
-)
+    argparser.add_argument(
+        "input-file",
+        metavar="INFILE",
+        type=str,
+        help="template file to process",
+    )
 
-argparser.add_argument(
-    "config",
-    metavar = "KEY=VALUE",
-    type = str,
-    nargs = "*",
-    help ="key-value pair to replace in the template",
-)
+    argparser.add_argument(
+        "output-file",
+        metavar="OUTFILE",
+        type=str,
+        help="location to save processed file to",
+    )
 
-args = vars(argparser.parse_args())
+    argparser.add_argument(
+        "config",
+        metavar="KEY=VALUE",
+        type=str,
+        nargs="*",
+        help="key-value pair to replace in the template",
+    )
+
+    args = vars(argparser.parse_args())
+
+    # Process configuration from arguments.
+    input_file = args["input-file"]
+    output_file = args["output-file"]
+
+    config = {}
+
+    for string in args["config"]:
+        k, value = string.split("=", maxsplit=1)
+        key = k.upper().replace("-", "_")
+
+        config[key] = value
+
+    # Process the template.
+    template_process(config, input_file, output_file)
 
 
-# Process configuration from arguments.
-input_file = args["input-file"]
-output_file = args["output-file"]
-
-config = {}
-
-for string in args["config"]:
-    k, value = string.split("=", maxsplit=1)
-    key = k.upper().replace("-", "_")
-
-    config[key] = value
-
-
-# Process the template.
-template_process(config, input_file, output_file)
+if __name__ == "__main__":
+    main()

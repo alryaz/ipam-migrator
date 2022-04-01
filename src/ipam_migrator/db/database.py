@@ -18,34 +18,26 @@
 #
 
 
-'''
+"""
 Database object type.
-'''
-
+"""
 
 import copy
 import json
 
 
 class Database(object):
-    '''
+    """
     Database object type.
-    '''
-
+    """
 
     # pylint: disable=too-few-public-methods
 
-
     # pylint: disable=too-many-arguments
-    def __init__(self,
-                 name,
-                 ip_addresses=None,
-                 prefixes=None,
-                 vlans=None,
-                 vrfs=None):
-        '''
+    def __init__(self, name, ip_addresses=None, prefixes=None, vlans=None, vrfs=None):
+        """
         Database object constructor.
-        '''
+        """
 
         self.name = name
 
@@ -54,12 +46,11 @@ class Database(object):
         self.vlans = copy.deepcopy(vlans) if vlans is not None else dict()
         self.vrfs = copy.deepcopy(vrfs) if vrfs is not None else dict()
 
-
     def __str__(self):
-        '''
+        """
         Human-readable stringifier method for databases,
         suitable for dumping to output.
-        '''
+        """
 
         return json.dumps(
             {

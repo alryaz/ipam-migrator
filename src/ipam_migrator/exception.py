@@ -18,28 +18,26 @@
 #
 
 
-'''
+"""
 Exception base class and implementations.
-'''
+"""
 
 
 class IpamMigratorError(Exception):
-    '''
+    """
     IPAM migrator exception base class.
-    '''
-
-    pass
+    """
 
 
 class AuthDataNotFoundError(IpamMigratorError):
-    '''
+    """
     Exception for required auth data not being found.
-    '''
+    """
 
     def __init__(self, name, api_type, param_description):
-        '''
+        """
         AuthDataNotFoundError initialisation method.
-        '''
+        """
 
         super().__init__(
             "{} database backend type '{}' expects auth data parameter(s) {}, none found".format(
@@ -51,14 +49,14 @@ class AuthDataNotFoundError(IpamMigratorError):
 
 
 class AuthMethodUnsupportedError(IpamMigratorError):
-    '''
+    """
     Exception for the given auth method being unsupported.
-    '''
+    """
 
     def __init__(self, api_type, api_auth_method, supported_methods):
-        '''
+        """
         AuthMethodUnsupportedError initialisation method.
-        '''
+        """
 
         if len(supported_methods) == 1:
             supported_methods_formatted = "'{}'".format(supported_methods[0])
@@ -78,14 +76,14 @@ class AuthMethodUnsupportedError(IpamMigratorError):
 
 
 class APIGetError(IpamMigratorError):
-    '''
+    """
     Exception for API GET method error.
-    '''
+    """
 
     def __init__(self, code, message):
-        '''
+        """
         APIGetError initialisation method.
-        '''
+        """
 
         self.api_code = code
         self.api_message = message
@@ -93,14 +91,14 @@ class APIGetError(IpamMigratorError):
 
 
 class APIOptionsError(IpamMigratorError):
-    '''
+    """
     Exception for API OPTIONS method error.
-    '''
+    """
 
     def __init__(self, code, message):
-        '''
+        """
         APIOptionsError initialisation method.
-        '''
+        """
 
         self.api_code = code
         self.api_message = message
@@ -108,14 +106,14 @@ class APIOptionsError(IpamMigratorError):
 
 
 class APIReadError(IpamMigratorError):
-    '''
+    """
     Exception for API general read method error.
-    '''
+    """
 
     def __init__(self, code, message):
-        '''
+        """
         APIReadError initialisation method.
-        '''
+        """
 
         self.api_code = code
         self.api_message = message
@@ -123,14 +121,14 @@ class APIReadError(IpamMigratorError):
 
 
 class APIWriteError(IpamMigratorError):
-    '''
+    """
     Exception for API general write method error.
-    '''
+    """
 
     def __init__(self, code, message):
-        '''
+        """
         APIWriteError initialisation method.
-        '''
+        """
 
         self.api_code = code
         self.api_message = message

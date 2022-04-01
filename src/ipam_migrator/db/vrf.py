@@ -18,40 +18,40 @@
 #
 
 
-'''
+"""
 Database type for VRFs.
-'''
-
+"""
 
 from ipam_migrator.db.object import Object
 
 
 class VRF(Object):
-    '''
+    """
     Database type for VRFs.
-    '''
-
+    """
 
     # pylint: disable=too-many-arguments
-    def __init__(self,
-                 vrf_id,
-                 route_distinguisher,
-                 enforce_unique=False,
-                 name=None, description=None):
-        '''
+    def __init__(
+        self,
+        vrf_id,
+        route_distinguisher,
+        enforce_unique=False,
+        name=None,
+        description=None,
+    ):
+        """
         VLAN group object constructor.
-        '''
+        """
 
         super().__init__(vrf_id, name, description)
 
         self.route_distinguisher = route_distinguisher
         self.enforce_unique = bool(enforce_unique)
 
-
     def __str__(self):
-        '''
+        """
         String representation of a VRF.
-        '''
+        """
 
         if self.name:
             return "VRF {} with name '{}'".format(self.id_get(), self.name)
@@ -59,17 +59,15 @@ class VRF(Object):
             return "VRF {} with description '{}'".format(self.id_get(), self.description)
         return "VRF {}".format(self.id_get())
 
-
     def as_dict(self):
-        '''
+        """
         Dictionary representation of a VRF.
-        '''
+        """
 
         return {
             "id": self.id_get(),
             "name": self.name,
             "description": self.description,
-
             "route_distinguisher": self.route_distinguisher,
             "enforce_unique": self.enforce_unique,
         }

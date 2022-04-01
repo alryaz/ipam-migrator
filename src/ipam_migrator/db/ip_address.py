@@ -18,10 +18,9 @@
 #
 
 
-'''
+"""
 Internet Protocol (IP) addresses.
-'''
-
+"""
 
 import ipaddress
 
@@ -29,21 +28,22 @@ from ipam_migrator.db.object import Object
 
 
 class IPAddress(Object):
-    '''
+    """
     Database type for Internet Protocol (IP) addresses.
-    '''
-
+    """
 
     # pylint: disable=too-many-arguments
-    def __init__(self,
-                 address_id,
-                 address,
-                 description=None,
-                 custom_fields=None,
-                 vrf_id=None):
-        '''
+    def __init__(
+        self,
+        address_id,
+        address,
+        description=None,
+        custom_fields=None,
+        vrf_id=None,
+    ):
+        """
         VLAN object constructor.
-        '''
+        """
 
         # Initialise database object with ID.
         super().__init__(address_id, None, description)
@@ -56,29 +56,25 @@ class IPAddress(Object):
         # Grouping fields, in ascending order of scale.
         self.vrf_id = int(vrf_id) if vrf_id is not None else None
 
-
     def __str__(self):
-        '''
+        """
         String representation of an IPAddress.
-        '''
+        """
 
         if self.description:
             return "IP address {} with description '{}'".format(self.address, self.description)
         return "IP address {}".format(self.address)
 
-
     def as_dict(self):
-        '''
+        """
         Dictionary representation of an IPAddress.
-        '''
+        """
 
         return {
             "id": self.id_get(),
             "description": self.description,
-
             "address": str(self.address),
             "family": self.family,
             "custom_fields": self.custom_fields.copy(),
-
             "vrf_id": self.vrf_id,
         }

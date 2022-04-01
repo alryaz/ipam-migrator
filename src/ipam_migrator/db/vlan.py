@@ -18,37 +18,31 @@
 #
 
 
-'''
+"""
 Database type for VLANs.
-'''
-
+"""
 
 from ipam_migrator.db.object import Object
 
 
 class VLAN(Object):
-    '''
+    """
     Database type for VLANs.
-    '''
+    """
 
-
-    def __init__(self,
-                 vlan_id,
-                 vid,
-                 name=None, description=None):
-        '''
+    def __init__(self, vlan_id, vid, name=None, description=None):
+        """
         VLAN object constructor.
-        '''
+        """
 
         super().__init__(vlan_id, name, description)
 
         self.vid = int(vid)
 
-
     def __str__(self):
-        '''
+        """
         String representation of a VLAN.
-        '''
+        """
 
         if self.name:
             return "VLAN {} with name '{}'".format(self.vid, self.name)
@@ -56,16 +50,14 @@ class VLAN(Object):
             return "VLAN {} with description '{}'".format(self.vid, self.description)
         return "VLAN {}".format(self.vid)
 
-
     def as_dict(self):
-        '''
+        """
         Dictionary representation of a VLAN.
-        '''
+        """
 
         return {
             "id": self.id_get(),
             "name": self.name,
             "description": self.description,
-
             "vid": self.vid,
         }

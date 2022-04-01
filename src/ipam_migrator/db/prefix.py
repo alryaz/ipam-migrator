@@ -18,10 +18,9 @@
 #
 
 
-'''
+"""
 Internet Protocol (IP) subnet prefixes.
-'''
-
+"""
 
 import ipaddress
 
@@ -29,21 +28,23 @@ from ipam_migrator.db.object import Object
 
 
 class Prefix(Object):
-    '''
+    """
     Database type for Internet Protocol (IP) subnet prefixes.
-    '''
-
+    """
 
     # pylint: disable=too-many-arguments
-    def __init__(self,
-                 prefix_id,
-                 prefix,
-                 is_pool=False,
-                 description=None,
-                 vlan_id=None, vrf_id=None):
-        '''
+    def __init__(
+        self,
+        prefix_id,
+        prefix,
+        is_pool=False,
+        description=None,
+        vlan_id=None,
+        vrf_id=None,
+    ):
+        """
         VLAN object constructor.
-        '''
+        """
 
         super().__init__(prefix_id, None, description)
 
@@ -55,31 +56,26 @@ class Prefix(Object):
         self.vlan_id = int(vlan_id) if vlan_id is not None else None
         self.vrf_id = int(vrf_id) if vrf_id is not None else None
 
-
     def __str__(self):
-        '''
+        """
         String representation of a Prefix.
-        '''
+        """
 
         if self.description:
             return "prefix {} with description '{}'".format(self.prefix, self.description)
         return "prefix {}".format(self.prefix)
 
-
     def as_dict(self):
-        '''
+        """
         Dictionary representation of a Prefix.
-        '''
+        """
 
         return {
             "id": self.id_get(),
             "description": self.description,
-
             "prefix": str(self.prefix),
             "family": self.family,
-
             "is_pool": self.is_pool,
-
             "vlan_id": self.vlan_id,
             "vrf_id": self.vrf_id,
         }

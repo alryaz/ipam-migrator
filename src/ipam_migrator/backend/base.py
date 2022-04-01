@@ -18,46 +18,42 @@
 #
 
 
-'''
+"""
 Database backend base class.
-'''
-
+"""
 
 import abc
 
 
 class BaseBackend(abc.ABC):
-    '''
+    """
     Database backend base class.
-    '''
-
+    """
 
     def __init__(self, logger, name):
-        '''
+        """
         Database backend constructor.
-        '''
+        """
 
         self.logger = logger
         self.name = name
 
-
     @abc.abstractmethod
-    def database_read(self,
-                      read_ip_addresses=True,
-                      read_prefixes=True,
-                      read_vlans=True,
-                      read_vrfs=True):
-        '''
+    def database_read(
+        self,
+        read_ip_addresses=True,
+        read_prefixes=True,
+        read_vlans=True,
+        read_vrfs=True,
+    ):
+        """
         Read a Database object from this backend.
-        '''
-
-        pass
-
+        """
+        raise NotImplementedError
 
     @abc.abstractmethod
     def database_write(self, database):
-        '''
+        """
         Write a Database object to this backend.
-        '''
-
-        pass
+        """
+        raise NotImplementedError

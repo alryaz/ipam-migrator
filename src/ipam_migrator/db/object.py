@@ -18,116 +18,104 @@
 #
 
 
-'''
+"""
 Database object base class.
-'''
+"""
 
 
 class Object(object):
-    '''
+    """
     Database object base class.
-    '''
-
+    """
 
     def __init__(self, object_id, name, description):
-        '''
+        """
         Database object constructor.
-        '''
+        """
 
         self.object_id = int(object_id)
         self.name = name
         self.description = description
 
-
     def id_get(self):
-        '''
+        """
         Get Object ID.
-        '''
+        """
 
         return self.object_id
 
-
     def name_get(self):
-        '''
+        """
         Get Object name.
-        '''
+        """
 
         return self.name
 
-
     def description_get(self):
-        '''
+        """
         Get Object discription.
-        '''
+        """
 
         return self.description
 
-
     def as_dict(self):
-        '''
+        """
         Get dictionary representation of this Object.
-        '''
+        """
 
         raise NotImplementedError()
 
-
     def __hash__(self):
-        '''
+        """
         Hash function for VLAN object, based around the VLAN ID.
-        '''
+        """
 
         return self.object_id
 
-
     def __lt__(self, other):
-        '''
+        """
         Less-than function for the object,
         implementing logical ordering based around the object ID.
-        '''
+        """
 
         return self.object_id < other.object_id
 
-
     def __le__(self, other):
-        '''
+        """
         Less-than-or-equal-to function for the object,
         implementing logical ordering based around the object ID.
-        '''
+        """
 
         return self.object_id <= other.object_id
 
-
     def __eq__(self, other):
-        '''
+        """
         Equal function for the object,
         implementing logical ordering based around the object ID.
-        '''
+        """
 
         return self.object_id == other.object_id
 
-
     def __ne__(self, other):
-        '''
+        """
         Not-equal function for the object,
         implementing logical ordering based around the object ID.
-        '''
+        """
 
         return self.object_id != other.object_id
 
-
     def __gt__(self, other):
-        '''
+        """
         Greater-than function for the object,
         implementing logical ordering based around the object ID.
-        '''
+        """
 
         return self.object_id > other.object_id
 
-
     def __ge__(self, other):
-        '''
+        """
         Greater-than-or-equal-to function for the object,
         implementing logical ordering based around the object ID.
-        '''
+        """
 
         return self.object_id >= other.object_id

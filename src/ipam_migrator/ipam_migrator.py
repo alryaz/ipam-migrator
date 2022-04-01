@@ -18,10 +18,9 @@
 #
 
 
-'''
+"""
 Main routine.
-'''
-
+"""
 
 import argparse
 import logging
@@ -35,9 +34,9 @@ from ipam_migrator.exception import AuthDataNotFoundError
 
 
 def main():
-    '''
+    """
     Main routine.
-    '''
+    """
 
     # pylint: disable=too-many-locals
     # pylint: disable=too-many-statements
@@ -63,7 +62,8 @@ def main():
     )
 
     argparser.add_argument(
-        "-l", "--log",
+        "-l",
+        "--log",
         metavar="FILE",
         type=str,
         default=None,
@@ -71,7 +71,8 @@ def main():
     )
 
     argparser.add_argument(
-        "-ll", "--log-level",
+        "-ll",
+        "--log-level",
         metavar="LEVEL",
         type=str,
         default="INFO",
@@ -80,24 +81,28 @@ def main():
 
     arg_input_ssl_verify = argparser.add_mutually_exclusive_group(required=False)
     arg_input_ssl_verify.add_argument(
-        "-iasv", "--input-api-ssl-verify",
+        "-iasv",
+        "--input-api-ssl-verify",
         action="store_true",
         help="verify the input API endpoint SSL certificate (default)",
     )
     arg_input_ssl_verify.add_argument(
-        "-naisv", "--no-input-api-ssl-verify",
+        "-naisv",
+        "--no-input-api-ssl-verify",
         action="store_false",
         help="do NOT verify the input API endpoint SSL certificate",
     )
 
     arg_output_ssl_verify = argparser.add_mutually_exclusive_group(required=False)
     arg_output_ssl_verify.add_argument(
-        "-oasv", "--output-api-ssl-verify",
+        "-oasv",
+        "--output-api-ssl-verify",
         action="store_true",
         help="verify the output API endpoint SSL certificate (default)",
     )
     arg_output_ssl_verify.add_argument(
-        "-noasv", "--no-output-api-ssl-verify",
+        "-noasv",
+        "--no-output-api-ssl-verify",
         action="store_false",
         help="do NOT verify the output API endpoint SSL certificate",
     )
@@ -121,7 +126,7 @@ def main():
         os.makedirs(os.path.dirname(log), exist_ok=True)
         logger_filehandler = logging.FileHandler(log)
         logger_filehandler.setFormatter(logger_formatter)
-        os.chmod(log, stat.S_IRUSR|stat.S_IWUSR|stat.S_IRGRP|stat.S_IROTH)
+        os.chmod(log, stat.S_IRUSR | stat.S_IWUSR | stat.S_IRGRP | stat.S_IROTH)
         logger.addHandler(logger_filehandler)
 
     logger.debug("started logger")
@@ -148,25 +153,34 @@ def main():
 
         # Configuration verification.
         api_data_check(
-            logger, "input",
-            input_api_endpoint, input_api_type,
-            input_api_auth_method, input_api_auth_data,
+            logger,
+            "input",
+            input_api_endpoint,
+            input_api_type,
+            input_api_auth_method,
+            input_api_auth_data,
             input_api_ssl_verify,
         )
 
         if use_output:
             api_data_check(
-                logger, "output",
-                output_api_endpoint, output_api_type,
-                output_api_auth_method, output_api_auth_data,
+                logger,
+                "output",
+                output_api_endpoint,
+                output_api_type,
+                output_api_auth_method,
+                output_api_auth_data,
                 output_api_ssl_verify,
             )
 
         # Connect to the input API endpoint, and read its database.
         input_backend = backend_create(
-            logger, "input",
-            input_api_endpoint, input_api_type,
-            input_api_auth_method, input_api_auth_data,
+            logger,
+            "input",
+            input_api_endpoint,
+            input_api_type,
+            input_api_auth_method,
+            input_api_auth_data,
             input_api_ssl_verify,
         )
         input_database = input_backend.database_read()
@@ -175,9 +189,12 @@ def main():
         # and write the input database to it.
         if use_output:
             output_backend = backend_create(
-                logger, "output",
-                output_api_endpoint, output_api_type,
-                output_api_auth_method, output_api_auth_data,
+                logger,
+                "output",
+                output_api_endpoint,
+                output_api_type,
+                output_api_auth_method,
+                output_api_auth_data,
                 output_api_ssl_verify,
             )
             output_backend.database_write(input_database)
@@ -198,9 +215,9 @@ def main():
 
 
 def api_data_read(logger, args, name):
-    '''
+    """
     Read the API data for the given target name.
-    '''
+    """
 
     # pylint: disable=unused-argument
 
@@ -209,23 +226,36 @@ def api_data_read(logger, args, name):
     api_type = api_data_list[1]
     api_auth_method = api_data_list[2]
     api_auth_data = api_data_list[3:]
-    if args["{}_api_ssl_verify".format(name)] is False and \
-       args["no_{}_api_ssl_verify".format(name)] is True:
-        api_ssl_verify = True # Default case
+    if (
+        args["{}_api_ssl_verify".format(name)] is False
+        and args["no_{}_api_ssl_verify".format(name)] is True
+    ):
+        api_ssl_verify = True  # Default case
     else:
         api_ssl_verify = args["{}_api_ssl_verify".format(name)]
 
-    return (api_endpoint, api_type, api_auth_method, api_auth_data, api_ssl_verify)
+    return (
+        api_endpoint,
+        api_type,
+        api_auth_method,
+        api_auth_data,
+        api_ssl_verify,
+    )
 
 
 # pylint: disable=too-many-arguments
-def api_data_check(logger, name,
-                   api_endpoint, api_type,
-                   api_auth_method, api_auth_data,
-                   api_ssl_verify):
-    '''
+def api_data_check(
+    logger,
+    name,
+    api_endpoint,
+    api_type,
+    api_auth_method,
+    api_auth_data,
+    api_ssl_verify,
+):
+    """
     Check the validity of the given API data.
-    '''
+    """
 
     logger.debug("%s backend API data", name)
     logger.debug("- API endpoint: %s", api_endpoint)
@@ -240,7 +270,10 @@ def api_data_check(logger, name,
     elif api_auth_method == "token":
         if not api_auth_data:
             raise AuthDataNotFoundError(name, api_type, "authentication token")
-        logger.debug("- authentication token: <redacted, length %i>", len(api_auth_data[0]))
+        logger.debug(
+            "- authentication token: <redacted, length %i>",
+            len(api_auth_data[0]),
+        )
 
     elif api_auth_method == "login":
         if not api_auth_data:
@@ -254,23 +287,36 @@ def api_data_check(logger, name,
 
 
 # pylint: disable=too-many-arguments
-def backend_create(logger, name,
-                   api_endpoint, api_type,
-                   api_auth_method, api_auth_data,
-                   api_ssl_verify):
-    '''
+def backend_create(
+    logger,
+    name,
+    api_endpoint,
+    api_type,
+    api_auth_method,
+    api_auth_data,
+    api_ssl_verify,
+):
+    """
     Read an API backend for the given target name.
-    '''
+    """
 
     if api_type == "phpipam":
-        return PhpIPAM(logger, name,
-                       api_endpoint, api_auth_method,
-                       api_auth_data, api_ssl_verify,
-                      )
+        return PhpIPAM(
+            logger,
+            name,
+            api_endpoint,
+            api_auth_method,
+            api_auth_data,
+            api_ssl_verify,
+        )
     elif api_type == "netbox":
-        return NetBox(logger, name,
-                      api_endpoint, api_auth_method,
-                      api_auth_data, api_ssl_verify,
-                     )
+        return NetBox(
+            logger,
+            name,
+            api_endpoint,
+            api_auth_method,
+            api_auth_data,
+            api_ssl_verify,
+        )
     else:
         raise RuntimeError("unknown {} database backend type '{}'".format(name, api_type))
